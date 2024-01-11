@@ -1,0 +1,43 @@
+pipeline:
+  name: muletest
+  identifier: muletest
+  projectIdentifier: FM_Sandbox
+  orgIdentifier: SE_Sandbox
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        repoName: mulesoftpipeline
+        build: <+input>
+  stages:
+    - stage:
+        name: mulebuild
+        identifier: mulebuild
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: RunTests
+                  name: RunTests_1
+                  identifier: RunTests_1
+                  spec:
+                    language: Java
+                    buildTool: Maven
+                    args: test
+                    runOnlySelectedTests: true
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - "**/*.xml"
+                    enableTestSplitting: false
+                  description: muletest
