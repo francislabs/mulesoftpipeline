@@ -11,12 +11,11 @@ pipeline:
         build: <+input>
   stages:
     - stage:
-        name: mulebuild
-        identifier: mulebuild
-        description: ""
+        identifier: build
         type: CI
+        name: build
         spec:
-          cloneCodebase: true
+          cloneCodebase: false
           platform:
             os: Linux
             arch: Amd64
@@ -26,18 +25,35 @@ pipeline:
           execution:
             steps:
               - step:
-                  type: RunTests
-                  name: RunTests_1
-                  identifier: RunTests_1
+                  type: Background
+                  name: Background_2
+                  identifier: Background_2
                   spec:
-                    language: Java
-                    buildTool: Maven
-                    args: test
-                    runOnlySelectedTests: true
-                    reports:
-                      type: JUnit
-                      spec:
-                        paths:
-                          - "**/*.xml"
-                    enableTestSplitting: false
-                  description: muletest
+                    connectorRef: harnessdockerregistry2
+                    image: mysql:8.1.0
+                    shell: Sh
+                    envVariables:
+                      MYSQL_ROOT_PASSWORD: my-secret-pw
+                      MYSQL_DATABASE: legacy
+                    portBindings:
+                      "3306": "3306"
+                    runAsUser: "0"
+              - step:
+                  type: Run
+                  name: Run_2
+                  identifier: Run_2
+                  spec:
+                    shell: Sh
+                    command: |
+                      sleep 60
+                      #telnet localhost 3306
+                      #service mysql start
+                      #systemctl status mysql
+                      #sleep 20
+                      #systemctl status mysql
+                      #sudo systemctl start mysql
+                      #mysql -h localhost -p my-secret-pw -P 3306 -D legacy
+                      mysql -h Background_2 -p my-secret-pw -u root -P 3306 -D legacy
+                    privileged: true
+                    runAsUser: "0"
+        description: ""
